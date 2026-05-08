@@ -1,0 +1,12 @@
+{
+  "name": "Anya · 个人博客",
+  "short_name": "Anya Blog",
+  "description": "分享代码、生活和思考",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f5f3",
+  "theme_color": "#35bfab",
+  "icons": [
+    { "src": "/cursor.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

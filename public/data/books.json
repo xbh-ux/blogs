@@ -1,0 +1,6 @@
+[
+  { "title": "深入理解计算机系统", "author": "Bryant & O'Hallaron", "status": "读完", "rating": 5, "note": "CSAPP，计算机基础必读。" },
+  { "title": "Go 程序设计语言", "author": "Donovan & Kernighan", "status": "读完", "rating": 5, "note": "Go 语言圣经。" },
+  { "title": "Clean Code", "author": "Robert C. Martin", "status": "在读", "rating": 4, "note": "代码整洁之道，受益匪浅。" },
+  { "title": "设计模式", "author": "GoF", "status": "想读", "rating": 0, "note": "" }
+]
