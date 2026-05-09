@@ -319,17 +319,17 @@ footer {
 
 .home-carousel__stack {
   position: absolute;
-  top: 50%;
-  right: 0.25rem;
-  left: clamp(7.5rem, 24%, 10rem);
-  height: min(156px, calc(100% - 1.25rem));
-  min-height: 118px;
-  transform: translateY(-50%);
+  inset: 0.35rem 0.35rem 0.35rem clamp(8.2rem, 26%, 10.8rem);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(0.35rem, 1vw, 0.7rem);
+  pointer-events: none;
 }
 
 .home-carousel__card {
-  position: absolute;
-  width: clamp(118px, 32%, 168px);
+  position: relative;
+  flex: 0 0 clamp(112px, 24%, 176px);
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 28px;
@@ -338,11 +338,19 @@ footer {
   padding: 10px;
   box-shadow: 0 20px 30px rgba(0, 0, 0, 0.08);
   transform-origin: center;
+  transform: translate(var(--card-shift-x, 0), var(--card-shift-y, 0)) rotate(var(--card-rotate, 0deg));
+  margin-left: clamp(-28px, -2.4vw, -14px);
   transition: transform 0.24s ease, box-shadow 0.24s ease;
+  pointer-events: auto;
+  will-change: transform;
 }
 
 .home-carousel__card:hover {
   box-shadow: 0 24px 34px rgba(0, 0, 0, 0.1);
+}
+
+.home-carousel__card:first-child {
+  margin-left: 0;
 }
 
 .home-carousel__badge {
@@ -1077,15 +1085,15 @@ html:not(.reduce-motion) .soft-reveal {
   }
 
   .home-carousel__stack {
-    top: 50%;
-    right: 0;
-    left: 0;
-    height: min(136px, calc(100% - 1rem));
-    min-height: 112px;
+    inset: 0.35rem 0.15rem 0.35rem clamp(5.3rem, 19%, 6.8rem);
+    justify-content: center;
+    gap: 0.15rem;
   }
 
   .home-carousel__card {
-    width: 128px;
+    flex-basis: clamp(88px, 25vw, 126px);
+    padding: 7px;
+    margin-left: clamp(-24px, -6vw, -10px);
   }
 
   .home-quick-grid {

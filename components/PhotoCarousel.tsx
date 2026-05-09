@@ -1,13 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 
 const ALBUMS = [
-  { key: '2024', rotate: '-7deg', x: '18%', y: '58%', gradient: 'linear-gradient(135deg,#fecdd3,#fbcfe8)' },
-  { key: '2025', rotate: '3deg', x: '40%', y: '48%', gradient: 'linear-gradient(135deg,#bae6fd,#93c5fd)', zIndex: 3 },
-  { key: '2026', rotate: '-4deg', x: '62%', y: '56%', gradient: 'linear-gradient(135deg,#a7f3d0,#6ee7b7)', zIndex: 2 },
-  { key: '记忆', rotate: '7deg', x: '82%', y: '48%', gradient: 'linear-gradient(135deg,#ddd6fe,#c4b5fd)', zIndex: 4 },
+  { key: '2024', rotate: '-8deg', shiftX: '-4%', shiftY: '8%', gradient: 'linear-gradient(135deg,#fecdd3,#fbcfe8)' },
+  { key: '2025', rotate: '4deg', shiftX: '2%', shiftY: '-4%', gradient: 'linear-gradient(135deg,#bae6fd,#93c5fd)', zIndex: 3 },
+  { key: '2026', rotate: '-5deg', shiftX: '9%', shiftY: '7%', gradient: 'linear-gradient(135deg,#a7f3d0,#6ee7b7)', zIndex: 2 },
+  { key: '记忆', rotate: '8deg', shiftX: '18%', shiftY: '-3%', gradient: 'linear-gradient(135deg,#ddd6fe,#c4b5fd)', zIndex: 4 },
 ];
 
 function getAlbumKey(src: string) {
@@ -104,11 +104,11 @@ export default function PhotoCarousel() {
               key={album.key}
               className="home-carousel__card"
               style={{
-                left: album.x,
-                top: album.y,
-                transform: `translate(-50%, -50%) rotate(${album.rotate})`,
+                '--card-rotate': album.rotate,
+                '--card-shift-x': album.shiftX,
+                '--card-shift-y': album.shiftY,
                 zIndex: album.zIndex || index + 1,
-              }}
+              } as CSSProperties}
             >
               <div className="h-full w-full overflow-hidden rounded-[22px]" style={{ background: album.gradient }}>
                 {imgs[album.key.toLowerCase()] ? (

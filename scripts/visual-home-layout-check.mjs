@@ -55,7 +55,25 @@ async function run() {
         }
       );
 
-      return { hero, stack, cards };
+      const cardEnvelope = cards.reduce((acc, card) => {
+        if (!acc) {
+          return {
+            x: card.x,
+            y: card.y,
+            right: card.right,
+            bottom: card.bottom,
+          };
+        }
+
+        return {
+          x: Math.min(acc.x, card.x),
+          y: Math.min(acc.y, card.y),
+          right: Math.max(acc.right, card.right),
+          bottom: Math.max(acc.bottom, card.bottom),
+        };
+      }, null);
+
+      return { hero, stack, cards, cardEnvelope };
     });
 
     if (!metrics.hero || !metrics.stack) {
@@ -63,6 +81,9 @@ async function run() {
     }
     if (metrics.cards.length < 3) {
       throw new Error(`图片墙卡片数量异常：${metrics.cards.length}`);
+    }
+    if (!metrics.cardEnvelope) {
+      throw new Error("未能计算图片墙卡片包围盒。");
     }
 
     const heroCenterY = metrics.hero.y + metrics.hero.height / 2;
@@ -90,6 +111,25 @@ async function run() {
           `卡片 ${card.index} 超出图片墙容器：${JSON.stringify(card)}`
         );
       }
+    }
+
+    const envelopeWidth = metrics.cardEnvelope.right - metrics.cardEnvelope.x;
+    const minEnvelopeWidth = Math.max(260, metrics.hero.width * 0.36);
+    if (envelopeWidth < minEnvelopeWidth) {
+      throw new Error(
+        `图片墙横向占位过窄：${round(envelopeWidth)}px（阈值 ${round(
+          minEnvelopeWidth
+        )}px）`
+      );
+    }
+
+    const minEnvelopeLeft = metrics.hero.x + metrics.hero.width * 0.22;
+    if (metrics.cardEnvelope.x < minEnvelopeLeft) {
+      throw new Error(
+        `图片墙左侧侵入标题区：${round(metrics.cardEnvelope.x)}px（最小应为 ${round(
+          minEnvelopeLeft
+        )}px）`
+      );
     }
 
     await mkdir(path.dirname(outputPath), { recursive: true });
