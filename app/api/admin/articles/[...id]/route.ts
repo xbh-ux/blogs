@@ -11,8 +11,9 @@ import {
   getPostSourceBySlug,
   invalidatePostCache,
 } from "@/lib/posts";
-import fs from "fs";
 import path from "path";
+import { promises as fs } from "node:fs";
+import { withFileLock } from "@/lib/file-lock";
 const postsDir = path.join(process.cwd(), "posts");
 
 export async function GET(
@@ -90,39 +91,40 @@ export async function PATCH(
     }
     const { title, content, date, tags } = normalizedInput.data;
 
-    const source = getPostSourceBySlug(articleId);
-    if (!source) {
-      return Response.json({ error: "Article not found" }, { status: 404 });
-    }
-    const { data: existingFrontmatter, file } = source;
+    return withFileLock(`admin:post:${articleId}`, async () => {
+      const source = getPostSourceBySlug(articleId);
+      if (!source) {
+        return Response.json({ error: "Article not found" }, { status: 404 });
+      }
+      const { data: existingFrontmatter, file } = source;
 
-    // 安全检查
-    if (!isPathInsideDirectory(file, postsDir)) {
-      return Response.json({ error: "Invalid path" }, { status: 400 });
-    }
+      if (!isPathInsideDirectory(file, postsDir)) {
+        return Response.json({ error: "Invalid path" }, { status: 400 });
+      }
 
-    const existingNormalizedDate = getFrontmatterDate(existingFrontmatter.date);
-    const nextDate =
-      existingNormalizedDate && existingNormalizedDate.split("T")[0] === date
-        ? existingFrontmatter.date
-        : date;
+      const existingNormalizedDate = getFrontmatterDate(existingFrontmatter.date);
+      const nextDate =
+        existingNormalizedDate && existingNormalizedDate.split("T")[0] === date
+          ? existingFrontmatter.date
+          : date;
 
-    const document = buildPostDocument({
-      frontmatter: {
-        ...existingFrontmatter,
-        title,
-        date: nextDate,
-        tags,
-      },
-      content,
-    });
+      const document = buildPostDocument({
+        frontmatter: {
+          ...existingFrontmatter,
+          title,
+          date: nextDate,
+          tags,
+        },
+        content,
+      });
 
-    fs.writeFileSync(file, document, "utf-8");
-    invalidatePostCache(articleId);
+      await fs.writeFile(file, document, "utf-8");
+      invalidatePostCache(articleId);
 
-    return Response.json({
-      success: true,
-      id: articleId,
+      return Response.json({
+        success: true,
+        id: articleId,
+      });
     });
   } catch (error) {
     console.error("Update Error:", error);
@@ -148,20 +150,21 @@ export async function DELETE(
     if (!isSafePostId(articleId)) {
       return Response.json({ error: "Invalid article id" }, { status: 400 });
     }
-    const file = getPostFileBySlug(articleId);
-    if (!file) {
-      return Response.json({ error: "Article not found" }, { status: 404 });
-    }
+    return withFileLock(`admin:post:${articleId}`, async () => {
+      const file = getPostFileBySlug(articleId);
+      if (!file) {
+        return Response.json({ error: "Article not found" }, { status: 404 });
+      }
 
-    // 安全检查
-    if (!isPathInsideDirectory(file, postsDir)) {
-      return Response.json({ error: "Invalid path" }, { status: 400 });
-    }
+      if (!isPathInsideDirectory(file, postsDir)) {
+        return Response.json({ error: "Invalid path" }, { status: 400 });
+      }
 
-    fs.unlinkSync(file);
-    invalidatePostCache(articleId);
+      await fs.unlink(file);
+      invalidatePostCache(articleId);
 
-    return Response.json({ success: true });
+      return Response.json({ success: true });
+    });
   } catch (error) {
     console.error("Delete Error:", error);
     return Response.json(

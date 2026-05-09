@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || '22' }}
+          script_stop: true
+          script: |
+            set -eu
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            npm ci
+            npm run build
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 restart "${{ secrets.DEPLOY_PM2_NAME || 'blogs-next' }}" || pm2 start npm --name "${{ secrets.DEPLOY_PM2_NAME || 'blogs-next' }}" -- start
+            else
+              systemctl restart "${{ secrets.DEPLOY_SERVICE_NAME || 'blogs-next' }}"
+            fi

@@ -6,11 +6,13 @@ import {
   isSafePostId,
   normalizePostInput,
 } from "@/lib/post-admin";
+import { withFileLock } from "@/lib/file-lock";
 import { invalidatePostCache } from "@/lib/posts";
-import fs from "fs";
 import path from "path";
+import { promises as fs } from "node:fs";
 
 const postsDir = path.join(process.cwd(), "posts");
+const CREATE_POST_LOCK_KEY = "admin:create-post";
 
 export async function POST(request: Request) {
   try {
@@ -35,48 +37,50 @@ export async function POST(request: Request) {
     }
     const { title, date, tags, content } = normalizedInput.data;
 
-    // 创建目录如果不存在
-    if (!fs.existsSync(postsDir)) {
-      fs.mkdirSync(postsDir, { recursive: true });
-    }
+    return withFileLock(CREATE_POST_LOCK_KEY, async () => {
+      await fs.mkdir(postsDir, { recursive: true });
 
-    const rawSlug = payload && typeof payload === "object" ? (payload as { slug?: unknown }).slug : undefined;
-    const normalizedSlug = createPostSlug(
-      typeof rawSlug === "string" && rawSlug ? rawSlug : title
-    );
-    if (!normalizedSlug || !isSafePostId(normalizedSlug)) {
-      return Response.json({ error: "文章 slug 不合法" }, { status: 400 });
-    }
-    const filePath = path.join(postsDir, `${normalizedSlug}.md`);
-
-    // 安全检查
-    if (!isPathInsideDirectory(filePath, postsDir)) {
-      return Response.json({ error: "Invalid path" }, { status: 400 });
-    }
-
-    // 检查文件是否已存在
-    if (fs.existsSync(filePath)) {
-      return Response.json(
-        { error: "Article already exists" },
-        { status: 409 }
+      const rawSlug =
+        payload && typeof payload === "object"
+          ? (payload as { slug?: unknown }).slug
+          : undefined;
+      const normalizedSlug = createPostSlug(
+        typeof rawSlug === "string" && rawSlug ? rawSlug : title
       );
-    }
+      if (!normalizedSlug || !isSafePostId(normalizedSlug)) {
+        return Response.json({ error: "文章 slug 不合法" }, { status: 400 });
+      }
+      const filePath = path.join(postsDir, `${normalizedSlug}.md`);
 
-    const document = buildPostDocument({
-      frontmatter: {
-        title,
-        date,
-        tags,
-      },
-      content,
-    });
+      if (!isPathInsideDirectory(filePath, postsDir)) {
+        return Response.json({ error: "Invalid path" }, { status: 400 });
+      }
 
-    fs.writeFileSync(filePath, document, "utf-8");
-    invalidatePostCache(normalizedSlug);
+      try {
+        await fs.access(filePath);
+        return Response.json({ error: "Article already exists" }, { status: 409 });
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+          throw error;
+        }
+      }
 
-    return Response.json({
-      success: true,
-      slug: normalizedSlug,
+      const document = buildPostDocument({
+        frontmatter: {
+          title,
+          date,
+          tags,
+        },
+        content,
+      });
+
+      await fs.writeFile(filePath, document, "utf-8");
+      invalidatePostCache(normalizedSlug);
+
+      return Response.json({
+        success: true,
+        slug: normalizedSlug,
+      });
     });
   } catch (error) {
     console.error("Create Error:", error);

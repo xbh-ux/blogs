@@ -1,7 +1,7 @@
 import { getAuthSession } from "@/auth";
 import { getAllPosts } from "@/lib/posts";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getAuthSession();
     if (!session) {

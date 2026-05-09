@@ -71,7 +71,25 @@ interface GetAllPostsOptions {
   includeDrafts?: boolean;
 }
 
+interface PostSource {
+  data: Record<string, unknown>;
+  content: string;
+}
+
+interface CachedPostSource extends PostSource {
+  file: string;
+  slug: string;
+}
+
+interface PostRuntimeCache {
+  allPosts: Post[];
+  publicPosts: Post[];
+  sourceBySlug: Map<string, CachedPostSource>;
+  fileBySlug: Map<string, string>;
+}
+
 const HTML_CONTENT_RE = /<(p|h[1-6]|ul|ol|li|blockquote|pre|code|img|figure|div|table|hr|br)\b/i;
+let postRuntimeCache: PostRuntimeCache | null = null;
 
 function getFrontmatterString(value: unknown, fallback = ''): string {
   return typeof value === 'string' ? value : fallback;
@@ -370,7 +388,79 @@ function readPostSource(file: string): { data: Record<string, unknown>; content:
   }
 }
 
+function buildPostRuntimeCache(): PostRuntimeCache {
+  const sourceBySlug = new Map<string, CachedPostSource>();
+  const fileBySlug = new Map<string, string>();
+
+  for (const file of getPostFiles()) {
+    const source = readPostSource(file);
+    if (!source) {
+      continue;
+    }
+
+    const slug = fileToSlug(file);
+    sourceBySlug.set(slug, { ...source, file, slug });
+    fileBySlug.set(slug, file);
+  }
+
+  const allPosts: Post[] = [];
+  const publicPosts: Post[] = [];
+
+  for (const [slug, source] of sourceBySlug) {
+    const { data, content, file } = source;
+    const draft = isDraftPost(data);
+    const post: Post = {
+      slug,
+      title: getFrontmatterString(data.title, path.basename(file, '.md')),
+      date: getFrontmatterDate(data.date),
+      tags: getFrontmatterStringArray(data.tags),
+      categories: getFrontmatterStringArray(data.categories),
+      excerpt: getExcerpt(content),
+      words: getWordCount(content),
+      featured: getFrontmatterBoolean(data.featured),
+      draft,
+    };
+
+    allPosts.push(post);
+    if (!draft) {
+      publicPosts.push(post);
+    }
+  }
+
+  const sorter = (a: Post, b: Post) => {
+    if (a.date && b.date) {
+      const dateComparison = Date.parse(b.date) - Date.parse(a.date);
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+    } else if (a.date || b.date) {
+      return a.date ? -1 : 1;
+    }
+
+    return a.slug.localeCompare(b.slug);
+  };
+
+  allPosts.sort(sorter);
+  publicPosts.sort(sorter);
+
+  return {
+    allPosts,
+    publicPosts,
+    sourceBySlug,
+    fileBySlug,
+  };
+}
+
+function getPostRuntimeCache() {
+  if (!postRuntimeCache || process.env.NODE_ENV !== 'production') {
+    postRuntimeCache = buildPostRuntimeCache();
+  }
+
+  return postRuntimeCache;
+}
+
 export function invalidatePostCache(slug?: string) {
+  postRuntimeCache = null;
   revalidatePath('/');
   revalidatePath('/timeline');
   revalidatePath('/stats');
@@ -386,7 +476,7 @@ export function getPostFileBySlug(slug: string): string | null {
     return null;
   }
 
-  return getPostFiles().find((file) => fileToSlug(file) === slug) ?? null;
+  return getPostRuntimeCache().fileBySlug.get(slug) ?? null;
 }
 
 export function getPostSourceBySlug(slug: string): {
@@ -394,19 +484,15 @@ export function getPostSourceBySlug(slug: string): {
   content: string;
   file: string;
 } | null {
-  const file = getPostFileBySlug(slug);
-  if (!file) {
-    return null;
-  }
-
-  const source = readPostSource(file);
+  const source = getPostRuntimeCache().sourceBySlug.get(slug);
   if (!source) {
     return null;
   }
 
   return {
-    ...source,
-    file,
+    data: source.data,
+    content: source.content,
+    file: source.file,
   };
 }
 
@@ -430,44 +516,12 @@ export function getPostAssetFileBySlug(slug: string, assetPath: string): string 
 }
 
 export function getAllPosts(options: GetAllPostsOptions = {}): Post[] {
-  return getPostFiles()
-    .map(file => {
-      const source = readPostSource(file);
-      if (!source) {
-        return null;
-      }
+  const runtimeCache = getPostRuntimeCache();
+  const posts = options.includeDrafts
+    ? runtimeCache.allPosts
+    : runtimeCache.publicPosts;
 
-      const { data, content } = source;
-      const draft = isDraftPost(data);
-      if (draft && !options.includeDrafts) {
-        return null;
-      }
-
-      return {
-        slug: fileToSlug(file),
-        title: getFrontmatterString(data.title, path.basename(file, '.md')),
-        date: getFrontmatterDate(data.date),
-        tags: getFrontmatterStringArray(data.tags),
-        categories: getFrontmatterStringArray(data.categories),
-        excerpt: getExcerpt(content),
-        words: getWordCount(content),
-        featured: getFrontmatterBoolean(data.featured),
-        draft,
-      };
-    })
-    .filter((post): post is Post => Boolean(post))
-    .sort((a, b) => {
-      if (a.date && b.date) {
-        const dateComparison = Date.parse(b.date) - Date.parse(a.date);
-        if (dateComparison !== 0) {
-          return dateComparison;
-        }
-      } else if (a.date || b.date) {
-        return a.date ? -1 : 1;
-      }
-
-      return a.slug.localeCompare(b.slug);
-    });
+  return posts.map((post) => ({ ...post }));
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {

@@ -5,8 +5,8 @@ export const metadata = {
   title: '优秀博客 · Anya的博客',
 };
 
-export default function LinkPage() {
-  const links = getFriendLinks();
+export default async function LinkPage() {
+  const links = await getFriendLinks();
 
   return (
     <main className="wiki-shell">

@@ -26,7 +26,7 @@ export default function LoginPage() {
       } else {
         setError("密码错误");
       }
-    } catch (err) {
+    } catch {
       setError("登录失败，请重试");
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-4 text-xs text-center" style={{ color: "#64748b" }}>
-          提示：请通过 ADMIN_PASSWORD 环境变量显式配置管理员密码
+          提示：生产环境请配置 ADMIN_PASSWORD_HASH（bcrypt）
         </div>
       </div>
     </div>

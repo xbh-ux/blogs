@@ -1,8 +1,10 @@
-import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 import { getPostAssetFileBySlug, normalizePostAssetPath } from '@/lib/posts';
 import { isPathInsideDirectory, isSafePostId } from '@/lib/post-admin';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+import { Readable } from 'node:stream';
 
 const postsDir = path.join(process.cwd(), 'posts');
 
@@ -57,14 +59,18 @@ export async function GET(
     return NextResponse.json({ error: 'invalid_asset_path' }, { status: 400 });
   }
 
+  const fileStat = await stat(assetFile);
   const ext = path.extname(assetFile).toLowerCase();
   const contentType = CONTENT_TYPE_BY_EXT[ext] ?? 'application/octet-stream';
-  const buffer = fs.readFileSync(assetFile);
+  const stream = createReadStream(assetFile);
+  const webStream = Readable.toWeb(stream) as ReadableStream;
 
-  return new NextResponse(buffer, {
+  return new NextResponse(webStream, {
     headers: {
       'Content-Type': contentType,
       'Cache-Control': 'public, max-age=31536000, immutable',
+      'Content-Length': String(fileStat.size),
+      'Last-Modified': fileStat.mtime.toUTCString(),
       'X-Content-Type-Options': 'nosniff',
     },
   });

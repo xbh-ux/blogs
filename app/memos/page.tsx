@@ -5,6 +5,7 @@ export const metadata = {
   title: '随记 · Anya的博客',
 };
 
-export default function MemosPage() {
-  return <MemosClient memos={getMemos()} />;
+export default async function MemosPage() {
+  const memos = await getMemos();
+  return <MemosClient memos={memos} />;
 }
