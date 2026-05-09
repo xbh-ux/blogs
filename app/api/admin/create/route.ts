@@ -6,8 +6,10 @@ import {
   isSafePostId,
   normalizePostInput,
 } from "@/lib/post-admin";
+import { enforceAdminWriteRateLimit } from "@/lib/admin-write-rate-limit";
 import { withFileLock } from "@/lib/file-lock";
 import { invalidatePostCache } from "@/lib/posts";
+import { readJsonBodyWithLimit } from "@/lib/request-guards";
 import path from "path";
 import { promises as fs } from "node:fs";
 
@@ -21,12 +23,22 @@ export async function POST(request: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let payload: unknown;
-    try {
-      payload = await request.json();
-    } catch {
-      return Response.json({ error: "请求 JSON 无效" }, { status: 400 });
+    const rateLimitResponse = await enforceAdminWriteRateLimit(
+      request,
+      "create"
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
+
+    const bodyResult = await readJsonBodyWithLimit(request);
+    if (!bodyResult.ok) {
+      return Response.json(
+        { error: bodyResult.error },
+        { status: bodyResult.status }
+      );
+    }
+    const payload = bodyResult.data;
 
     const normalizedInput = normalizePostInput(payload);
     if (!normalizedInput.data) {

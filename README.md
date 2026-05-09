@@ -27,6 +27,9 @@ cp .env.example .env.local
 - `ADMIN_PASSWORD`：兼容旧配置（不推荐，仅迁移）
 - `ADMIN_LOGIN_MAX_ATTEMPTS`：登录最大失败次数（默认 5）
 - `ADMIN_LOGIN_WINDOW_MINUTES`：登录限流窗口分钟数（默认 15）
+- `ADMIN_WRITE_MAX_REQUESTS`：后台写接口限流阈值（默认 60/窗口）
+- `ADMIN_WRITE_WINDOW_MINUTES`：后台写接口限流窗口（默认 10 分钟）
+- `ADMIN_API_MAX_BODY_BYTES`：后台接口 JSON 请求体上限（默认 1048576）
 - `TRUST_PROXY_HEADERS`：仅在可信反向代理场景设为 `true`
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`：可选，启用跨实例限流
 

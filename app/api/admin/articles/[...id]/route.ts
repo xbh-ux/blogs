@@ -5,6 +5,7 @@ import {
   isSafePostId,
   normalizePostInput,
 } from "@/lib/post-admin";
+import { enforceAdminWriteRateLimit } from "@/lib/admin-write-rate-limit";
 import {
   getFrontmatterDate,
   getPostFileBySlug,
@@ -14,6 +15,7 @@ import {
 import path from "path";
 import { promises as fs } from "node:fs";
 import { withFileLock } from "@/lib/file-lock";
+import { readJsonBodyWithLimit } from "@/lib/request-guards";
 const postsDir = path.join(process.cwd(), "posts");
 
 export async function GET(
@@ -75,12 +77,22 @@ export async function PATCH(
       return Response.json({ error: "Invalid article id" }, { status: 400 });
     }
 
-    let payload: unknown;
-    try {
-      payload = await request.json();
-    } catch {
-      return Response.json({ error: "请求 JSON 无效" }, { status: 400 });
+    const rateLimitResponse = await enforceAdminWriteRateLimit(
+      request,
+      "update"
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
+
+    const bodyResult = await readJsonBodyWithLimit(request);
+    if (!bodyResult.ok) {
+      return Response.json(
+        { error: bodyResult.error },
+        { status: bodyResult.status }
+      );
+    }
+    const payload = bodyResult.data;
 
     const normalizedInput = normalizePostInput(payload);
     if (!normalizedInput.data) {
@@ -143,6 +155,14 @@ export async function DELETE(
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimitResponse = await enforceAdminWriteRateLimit(
+      request,
+      "delete"
+    );
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     const { id } = await params;

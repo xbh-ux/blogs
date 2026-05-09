@@ -16,7 +16,13 @@ GET /api/health
   "timestamp": "2026-05-09T08:00:00.000Z",
   "uptimeSec": 12345,
   "node": "v20.x",
-  "env": "production"
+  "env": "production",
+  "checks": {
+    "authSecretConfigured": true,
+    "adminPasswordConfigured": true,
+    "loginRateLimitBackend": "upstash",
+    "writeRateLimitBackend": "upstash"
+  }
 }
 ```
 

@@ -217,3 +217,7 @@ export async function verifyAdminPassword(inputPassword: string) {
 
   return false;
 }
+
+export function isUsingUpstashForLoginRateLimit() {
+  return Boolean(upstashRatelimit);
+}
