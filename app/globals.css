@@ -330,6 +330,7 @@ footer {
 .home-carousel__card {
   position: relative;
   flex: 0 0 clamp(112px, 24%, 176px);
+  --card-shift-scale: 1;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 28px;
@@ -338,7 +339,11 @@ footer {
   padding: 10px;
   box-shadow: 0 20px 30px rgba(0, 0, 0, 0.08);
   transform-origin: center;
-  transform: translate(var(--card-shift-x, 0), var(--card-shift-y, 0)) rotate(var(--card-rotate, 0deg));
+  transform: translate(
+      calc(var(--card-shift-x, 0%) * var(--card-shift-scale)),
+      calc(var(--card-shift-y, 0%) * var(--card-shift-scale))
+    )
+    rotate(var(--card-rotate, 0deg));
   margin-left: clamp(-28px, -2.4vw, -14px);
   transition: transform 0.24s ease, box-shadow 0.24s ease;
   pointer-events: auto;
@@ -1085,15 +1090,20 @@ html:not(.reduce-motion) .soft-reveal {
   }
 
   .home-carousel__stack {
-    inset: 0.35rem 0.15rem 0.35rem clamp(5.3rem, 19%, 6.8rem);
+    inset: 0.35rem 0.2rem 0.35rem clamp(5.3rem, 19%, 6.8rem);
     justify-content: center;
     gap: 0.15rem;
   }
 
   .home-carousel__card {
-    flex-basis: clamp(88px, 25vw, 126px);
+    flex-basis: clamp(80px, 22vw, 118px);
     padding: 7px;
-    margin-left: clamp(-24px, -6vw, -10px);
+    margin-left: clamp(-18px, -4.5vw, -8px);
+    --card-shift-scale: 0.45;
+  }
+
+  .home-carousel__card:nth-child(4) {
+    display: none;
   }
 
   .home-quick-grid {

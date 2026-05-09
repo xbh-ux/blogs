@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: visual-home-layout
-          path: output/playwright/home-layout-check.png
+          path: output/playwright/home-layout
           if-no-files-found: ignore
 
       - name: Stop app
