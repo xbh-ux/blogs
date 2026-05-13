@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "node scripts/check-windows-build-env.cjs && next build --webpack",
+    "build": "node scripts/check-windows-build-env.cjs && next build --webpack && node scripts/prepare-standalone-assets.cjs",
     "build:ntfs-copy": "node scripts/build-on-ntfs.cjs",
     "start": "next start",
     "lint": "eslint .",

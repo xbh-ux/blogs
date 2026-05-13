@@ -8,6 +8,10 @@
 - 当前生产目录建议使用：`/root/apps/blogs-next`
 - 当前生产运行建议使用：`pm2 + .next/standalone/server.js`
 
+> 重要：由于生产使用的是 `output: "standalone"`，每次构建后必须确保 `public/` 和 `.next/static/`
+> 已同步到 `.next/standalone/` 下，否则页面 HTML 虽然能打开，但 CSS、图片、`manifest.json` 等静态资源会 404。
+> 当前仓库已经通过 `npm run build` 自动完成这一步。
+
 首次部署：
 
 ```bash
@@ -83,6 +87,15 @@ pm2 save
 
 ```bash
 pm2 logs blogs-next --lines 200
+```
+
+- 样式丢失、图片 404、`manifest.json` 返回 404 页面时，优先检查：
+
+```bash
+ls -lah .next/standalone/public
+ls -lah .next/standalone/.next/static
+curl -I http://127.0.0.1:8081/_next/static/css/*.css
+curl -I http://127.0.0.1:8081/manifest.json
 ```
 
 - 如遇 `package-lock.json` 与 `package.json` 短暂不同步，可先使用：
