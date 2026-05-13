@@ -27,16 +27,19 @@
   --color-fg: var(--text);
   --color-fg-2: var(--text-secondary);
   --font-sans:
-    "Noto Sans SC",
     "PingFang SC",
+    "SF Pro Text",
     -apple-system,
     BlinkMacSystemFont,
+    "Helvetica Neue",
     "Segoe UI",
     sans-serif;
   --font-display:
-    "Averia Gruesa Libre",
-    "Noto Sans SC",
     "PingFang SC",
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
     sans-serif;
 }
 

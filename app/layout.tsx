@@ -44,14 +44,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.cn" />
-        <link rel="preconnect" href="https://fonts.gstatic.cn" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.cn/css2?family=Averia+Gruesa+Libre&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="site-body" suppressHydrationWarning>
         {children}
         <BackToTop />
