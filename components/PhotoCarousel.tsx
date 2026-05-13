@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, type CSSProperties } from 'react';
 
 const ALBUMS = [
-  { key: '2024', rotate: '-8deg', shiftX: '-4%', shiftY: '8%', gradient: 'linear-gradient(135deg,#fecdd3,#fbcfe8)' },
-  { key: '2025', rotate: '4deg', shiftX: '2%', shiftY: '-4%', gradient: 'linear-gradient(135deg,#bae6fd,#93c5fd)', zIndex: 3 },
-  { key: '2026', rotate: '-5deg', shiftX: '9%', shiftY: '7%', gradient: 'linear-gradient(135deg,#a7f3d0,#6ee7b7)', zIndex: 2 },
-  { key: '记忆', rotate: '8deg', shiftX: '18%', shiftY: '-3%', gradient: 'linear-gradient(135deg,#ddd6fe,#c4b5fd)', zIndex: 4 },
+  { key: '2024', rotate: '-7deg', shiftX: '0%', shiftY: '8%', gradient: 'linear-gradient(135deg,#fecdd3,#fbcfe8)' },
+  { key: '2025', rotate: '3deg', shiftX: '0%', shiftY: '-4%', gradient: 'linear-gradient(135deg,#bae6fd,#93c5fd)', zIndex: 3 },
+  { key: '2026', rotate: '-4deg', shiftX: '0%', shiftY: '6%', gradient: 'linear-gradient(135deg,#a7f3d0,#6ee7b7)', zIndex: 2 },
+  { key: '记忆', rotate: '7deg', shiftX: '0%', shiftY: '-2%', gradient: 'linear-gradient(135deg,#ddd6fe,#c4b5fd)', zIndex: 4 },
 ];
 
 function getAlbumKey(src: string) {
@@ -87,6 +87,10 @@ export default function PhotoCarousel() {
     >
       <div className="home-carousel__copy">
         <div className="home-section-eyebrow">Photo Archive</div>
+        <div className="home-carousel__title">按年份整理的照片墙</div>
+        <div className="home-carousel__description">
+          点击查看 2024、2025、2026 和“记忆”相册，把碎片化的照片整理成一条轻量时间线。
+        </div>
       </div>
 
       <div className="home-carousel__stack">
@@ -110,16 +114,20 @@ export default function PhotoCarousel() {
                 zIndex: album.zIndex || index + 1,
               } as CSSProperties}
             >
-              <div className="h-full w-full overflow-hidden rounded-[22px]" style={{ background: album.gradient }}>
+              <div className="home-carousel__media" style={{ background: album.gradient }}>
                 {imgs[album.key.toLowerCase()] ? (
                   <img
                     src={imgs[album.key.toLowerCase()]}
                     alt={`${album.key} 相册预览`}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover"
+                    className="home-carousel__image"
                   />
-                ) : null}
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs font-semibold" style={{ color: 'rgba(51,79,82,0.62)' }}>
+                    {album.key}
+                  </div>
+                )}
               </div>
               <div className="home-carousel__badge">{album.key}</div>
             </div>

@@ -290,7 +290,10 @@ footer {
 
 .home-carousel {
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(154px, 220px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.85rem, 2vw, 1.5rem);
   min-height: 176px;
   height: 100%;
   overflow: hidden;
@@ -299,6 +302,8 @@ footer {
 .home-carousel__copy {
   position: relative;
   z-index: 5;
+  align-self: start;
+  padding: 0.3rem 0 0.15rem 0.25rem;
 }
 
 .home-carousel__title {
@@ -318,20 +323,20 @@ footer {
 }
 
 .home-carousel__stack {
-  position: absolute;
-  inset: 0.35rem 0.35rem 0.35rem clamp(8.2rem, 26%, 10.8rem);
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: clamp(0.35rem, 1vw, 0.7rem);
-  pointer-events: none;
+  justify-content: center;
+  gap: clamp(0.5rem, 1vw, 0.9rem);
+  min-width: 0;
+  padding: 0.25rem 0.25rem 0.25rem 0;
 }
 
 .home-carousel__card {
   position: relative;
-  flex: 0 0 clamp(112px, 24%, 176px);
+  flex: 0 0 clamp(110px, 16vw, 154px);
   --card-shift-scale: 1;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.86);
@@ -344,7 +349,7 @@ footer {
       calc(var(--card-shift-y, 0%) * var(--card-shift-scale))
     )
     rotate(var(--card-rotate, 0deg));
-  margin-left: clamp(-28px, -2.4vw, -14px);
+  margin-left: clamp(-10px, -1.2vw, -3px);
   transition: transform 0.24s ease, box-shadow 0.24s ease;
   pointer-events: auto;
   will-change: transform;
@@ -358,10 +363,27 @@ footer {
   margin-left: 0;
 }
 
+.home-carousel__media {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.home-carousel__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+}
+
 .home-carousel__badge {
   position: absolute;
-  right: 14px;
+  left: 50%;
   bottom: 14px;
+  transform: translateX(-50%);
   min-width: 42px;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
@@ -1028,6 +1050,7 @@ html:not(.reduce-motion) .soft-reveal {
 
   .home-carousel {
     min-height: 176px;
+    grid-template-columns: minmax(132px, 180px) minmax(0, 1fr);
   }
 
   .home-carousel__copy {
@@ -1043,7 +1066,7 @@ html:not(.reduce-motion) .soft-reveal {
   }
 }
 
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
   .wiki-shell {
     padding-inline: 16px;
     padding-block: 24px 40px;
@@ -1089,21 +1112,44 @@ html:not(.reduce-motion) .soft-reveal {
     flex-direction: column;
   }
 
+  .home-carousel {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 0.9rem;
+  }
+
+  .home-carousel__copy {
+    padding: 0;
+  }
+
   .home-carousel__stack {
-    inset: 0.35rem 0.2rem 0.35rem clamp(5.3rem, 19%, 6.8rem);
-    justify-content: center;
-    gap: 0.15rem;
+    padding: 0.15rem 0;
+    justify-content: flex-start;
+    gap: 0.35rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .home-carousel__stack::-webkit-scrollbar {
+    display: none;
   }
 
   .home-carousel__card {
-    flex-basis: clamp(80px, 22vw, 118px);
+    flex-basis: clamp(82px, 21vw, 112px);
     padding: 7px;
-    margin-left: clamp(-18px, -4.5vw, -8px);
-    --card-shift-scale: 0.45;
+    margin-left: clamp(-10px, -2vw, -4px);
+    --card-shift-scale: 0.4;
   }
 
-  .home-carousel__card:nth-child(4) {
-    display: none;
+  .home-carousel__title {
+    margin-top: 0.55rem;
+    font-size: 1.1rem;
+  }
+
+  .home-carousel__description {
+    margin-top: 0.45rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
   }
 
   .home-quick-grid {
