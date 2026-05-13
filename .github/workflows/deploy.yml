@@ -23,11 +23,18 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || '22' }}
-          script_stop: true
           script: |
             set -eu
             cd "${{ secrets.DEPLOY_PATH }}"
-            git fetch origin main
+            git config --global http.version HTTP/1.1
+            n=0
+            until [ "$n" -ge 3 ]; do
+              git fetch --verbose origin main && break
+              n=$((n+1))
+              echo "git fetch failed, retry $n/3" >&2
+              sleep 3
+            done
+            [ "$n" -lt 3 ] || exit 1
             git checkout main
             git reset --hard origin/main
             npm ci --no-audit --no-fund || npm install --no-audit --no-fund
