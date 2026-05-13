@@ -181,14 +181,18 @@ footer {
 
 .wiki-home-grid {
   display: grid;
-  grid-template-columns: minmax(460px, 1.18fr) minmax(330px, 0.82fr);
-  grid-template-rows: 222px auto minmax(430px, auto);
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  grid-template-rows: auto auto auto;
   grid-template-areas:
     "hero status"
-    "intro intro"
+    "intro side"
     "feature side";
   gap: 18px;
   align-items: stretch;
+}
+
+.wiki-home-grid {
+  width: 100%;
 }
 
 .wiki-home-grid > * {
@@ -207,12 +211,12 @@ footer {
 
 .wiki-home-card--hero {
   grid-area: hero;
-  min-height: 222px;
+  min-height: 0;
 }
 
 .wiki-home-card--intro {
   grid-area: intro;
-  min-height: 332px;
+  min-height: 0;
 }
 
 .wiki-home-card--feature {
@@ -222,7 +226,7 @@ footer {
 
 .wiki-home-card--status {
   grid-area: status;
-  min-height: 222px;
+  min-height: 0;
 }
 
 .wiki-home-card--calendar {
@@ -237,7 +241,7 @@ footer {
 .wiki-home-side-stack {
   grid-area: side;
   display: grid;
-  grid-template-rows: minmax(218px, auto) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   gap: 18px;
 }
 
@@ -425,7 +429,7 @@ footer {
 
 .home-intro__headline {
   margin-top: 0.8rem;
-  font-size: clamp(1.55rem, 2.2vw, 2.35rem);
+  font-size: clamp(1.45rem, 2vw, 2.1rem);
   font-weight: 700;
   line-height: 1.14;
   letter-spacing: -0.03em;
@@ -434,10 +438,10 @@ footer {
 
 .home-intro__description {
   margin-top: 0.8rem;
-  max-width: 35ch;
+  max-width: 40ch;
   color: var(--text-secondary);
-  line-height: 1.8;
-  font-size: 0.95rem;
+  line-height: 1.72;
+  font-size: 0.92rem;
 }
 
 .home-intro__stats {
@@ -1028,17 +1032,18 @@ html:not(.reduce-motion) .soft-reveal {
 
   .wiki-home-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: 222px auto minmax(420px, auto);
+    grid-template-rows: auto auto auto;
     grid-template-areas:
       "hero status"
-      "intro intro"
-      "feature side";
+      "intro feature"
+      "side side";
     gap: 12px;
     align-items: stretch;
   }
 
   .wiki-home-side-stack {
-    grid-template-rows: minmax(212px, auto) minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
     gap: 12px;
   }
 
@@ -1113,6 +1118,10 @@ html:not(.reduce-motion) .soft-reveal {
   .home-intro__header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .home-intro__stats {
+    grid-template-columns: 1fr;
   }
 
   .home-carousel {

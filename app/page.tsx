@@ -27,11 +27,34 @@ export default function Home() {
 
   return (
     <main className="wiki-shell">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="wiki-home-columns">
-          <div className="wiki-home-column wiki-home-column--left">
-            <Sidebar />
-          </div>
+      <div className="mx-auto max-w-[1240px] grid gap-5 page-grid" style={{ gridTemplateColumns: '280px minmax(0, 1fr)' }}>
+        <div className="page-sidebar">
+          <Sidebar />
+        </div>
+
+        <div className="wiki-page-content">
+          <section className="glass wiki-page-hero">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="wiki-page-hero__eyebrow">Home</div>
+                <h1>个人维基首页</h1>
+                <p>
+                  把最近文章、照片、天气、日历和音乐整理在同一块内容区里，让主页和“近期文章”等内页保持更统一的浏览节奏。
+                </p>
+              </div>
+              <div
+                className="home-feature-card__meta rounded-[22px] border px-4 py-3 text-right"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface-alt)' }}
+              >
+                <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                  Total Words
+                </div>
+                <div className="mt-1 text-[1.55rem] font-semibold tabular-nums" style={{ color: 'var(--accent)' }}>
+                  {totalWords > 9999 ? `${Math.round(totalWords / 1000)}k` : totalWords}
+                </div>
+              </div>
+            </div>
+          </section>
 
           <div className="wiki-home-grid">
             <section className="glass wiki-home-card wiki-home-card--hero soft-reveal overflow-hidden">
@@ -73,15 +96,12 @@ export default function Home() {
                       {featurePost?.title || '更多内容整理中'}
                     </Link>
                   </div>
-                  <div
-                    className="home-feature-card__meta rounded-[22px] border px-4 py-3 text-right"
-                    style={{ borderColor: 'var(--border)', background: 'var(--surface-alt)' }}
-                  >
+                  <div className="home-feature-card__meta rounded-[22px] border px-4 py-3 text-right" style={{ borderColor: 'var(--border)', background: 'var(--surface-alt)' }}>
                     <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      Total Words
+                      Latest
                     </div>
-                    <div className="mt-1 text-[1.55rem] font-semibold tabular-nums" style={{ color: 'var(--accent)' }}>
-                      {totalWords > 9999 ? `${Math.round(totalWords / 1000)}k` : totalWords}
+                    <div className="mt-1 text-[1.1rem] font-semibold tabular-nums" style={{ color: 'var(--accent)' }}>
+                      {featurePost?.date ? featurePost.date.slice(5, 10) : '--'}
                     </div>
                   </div>
                 </div>
