@@ -86,10 +86,10 @@ export default function PhotoCarousel() {
       }}
     >
       <div className="home-carousel__copy">
-        <div className="home-section-eyebrow">Photo Archive</div>
-        <div className="home-carousel__title">按年份整理的照片墙</div>
+        <div className="home-section-eyebrow">照片档案</div>
+        <div className="home-carousel__title">按年份整理的相册</div>
         <div className="home-carousel__description">
-          点击查看 2024、2025、2026 和“记忆”相册，把碎片化的照片整理成一条轻量时间线。
+          点击查看 2024、2025、2026 和“记忆”相册，用更轻量的方式浏览这些照片记录。
         </div>
       </div>
 

@@ -31,10 +31,10 @@ export default function HomeGreetingCard({ greeting, postCount, tagCount, daysSi
           <div className="min-w-0 flex-1">
             <div className="home-section-eyebrow">{greeting}</div>
             <div className="home-intro__headline">
-              I&apos;m <span style={{ color: 'var(--accent)' }}>Anya</span>, Nice to meet you!
+              你好，我是 <span style={{ color: 'var(--accent)' }}>Anya</span>
             </div>
             <p className="home-intro__description">
-              记录代码、阅读、照片和慢慢堆积起来的日常灵感，把生活一点点整理成自己的个人维基。
+              这里用来整理代码、阅读、照片和日常灵感。相比时间线页偏内容浏览，这一块更像我的个人说明与站点索引。
             </p>
           </div>
         </div>

@@ -12,7 +12,7 @@ export default function Home() {
   const posts = getAllPosts();
   const latestPost = posts[0];
   const featurePost = posts.find((post) => post.featured) || posts.find((post) => post.slug !== latestPost?.slug) || null;
-  const featureLabel = featurePost?.featured ? 'Featured Post' : 'Next Up';
+  const featureLabel = featurePost?.featured ? '精选文章' : '近期文章';
   const totalWords = posts.reduce((sum, post) => sum + (Number(post.words) || 0), 0);
   const allTags = new Set(posts.flatMap((post) => post.tags));
   const firstDatedPost = [...posts].reverse().find((post) => post.date);
@@ -23,7 +23,7 @@ export default function Home() {
   const today = new Date();
   const currentDay = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
   const daysSince = startDay ? Math.max(0, Math.floor((currentDay - startDay) / 86400000)) : 0;
-  const greeting = 'Welcome Here';
+  const greeting = 'Profile';
 
   return (
     <main className="wiki-shell">
@@ -34,12 +34,12 @@ export default function Home() {
 
         <div className="wiki-page-content">
           <section className="glass wiki-page-hero">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0">
-                <div className="wiki-page-hero__eyebrow">Home</div>
+                <div className="wiki-page-hero__eyebrow">Overview</div>
                 <h1>个人维基首页</h1>
                 <p>
-                  把最近文章、照片、天气、日历和音乐整理在同一块内容区里，让主页和“近期文章”等内页保持更统一的浏览节奏。
+                  把最近文章、照片、天气、日历和音乐整理在同一块内容区里，让主页既保留总览能力，也和内页保持统一的阅读节奏。
                 </p>
               </div>
               <div
@@ -64,7 +64,7 @@ export default function Home() {
             <section className="glass wiki-home-card wiki-home-card--status soft-reveal">
               <div className="home-status-card">
                 <div className="home-section-eyebrow">
-                  Right Now
+                  此刻
                 </div>
                 <div className="home-status-card__clock">
                   <Clock />
@@ -107,7 +107,7 @@ export default function Home() {
                 </div>
 
                 <p className="home-feature-card__summary line-clamp-4 text-[15px] leading-7" style={{ color: 'var(--text-secondary)' }}>
-                  {featurePost?.excerpt || '继续逛逛时间线、读书和相册页，看看更多内容。'}
+                  {featurePost?.excerpt || '继续浏览时间线、读书和相册页，把最近更新和长期整理的内容连起来看。'}
                 </p>
 
                 {featurePost?.tags?.length ? (
@@ -120,7 +120,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-                    推荐文章
+                    继续阅读
                   </div>
                 )}
               </div>
@@ -129,7 +129,7 @@ export default function Home() {
             <div className="wiki-home-side-stack">
               <section className="glass wiki-home-card wiki-home-card--calendar soft-reveal">
                 <div className="mb-3 home-section-eyebrow">
-                  Calendar
+                  日历
                 </div>
                 <Calendar />
               </section>
