@@ -60,6 +60,15 @@ function normalizeIpToken(value: string | null | undefined) {
   return token;
 }
 
+function normalizeHeaderToken(
+  value: string | null | undefined,
+  maxLength = 256
+) {
+  const token = value?.trim();
+  if (!token) return null;
+  return token.length > maxLength ? token.slice(0, maxLength) : token;
+}
+
 function getForwardedIp(request?: Request) {
   const forwardedFor = request?.headers
     .get("x-forwarded-for")
@@ -67,17 +76,43 @@ function getForwardedIp(request?: Request) {
   return normalizeIpToken(forwardedFor);
 }
 
+function getRequestFingerprint(request?: Request) {
+  const userAgent = normalizeHeaderToken(request?.headers.get("user-agent"), 512);
+  const acceptLanguage = normalizeHeaderToken(
+    request?.headers.get("accept-language"),
+    256
+  );
+  const secFetchSite = normalizeHeaderToken(
+    request?.headers.get("sec-fetch-site"),
+    64
+  );
+
+  if (!userAgent && !acceptLanguage && !secFetchSite) {
+    return "local";
+  }
+
+  const fingerprint = [
+    userAgent ?? "unknown-agent",
+    acceptLanguage ?? "unknown-language",
+    secFetchSite ?? "unknown-site",
+  ].join("|");
+
+  return `fingerprint:${createHash("sha256")
+    .update(fingerprint)
+    .digest("hex")
+    .slice(0, 24)}`;
+}
+
 export function getClientKey(request?: Request) {
   const realIp = normalizeIpToken(request?.headers.get("x-real-ip"));
   const cfIp = normalizeIpToken(request?.headers.get("cf-connecting-ip"));
   const forwardedIp = getForwardedIp(request);
-  const fallback = "local";
 
-  if (trustProxyHeaders && forwardedIp) {
-    return forwardedIp;
+  if (trustProxyHeaders) {
+    return forwardedIp || cfIp || realIp || getRequestFingerprint(request);
   }
 
-  return realIp || cfIp || fallback;
+  return getRequestFingerprint(request);
 }
 
 function pruneFailedLogins(now: number) {

@@ -1,11 +1,20 @@
 import { getAuthSession } from "@/auth";
 import { getAllPosts } from "@/lib/posts";
+import { enforceSameOrigin } from "@/lib/request-guards";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const originGuard = enforceSameOrigin(request);
+    if (!originGuard.ok) {
+      return Response.json(
+        { error: originGuard.error },
+        { status: originGuard.status }
+      );
     }
 
     const articles = getAllPosts({ includeDrafts: true }).map((post) => ({

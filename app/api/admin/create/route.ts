@@ -9,7 +9,7 @@ import {
 import { enforceAdminWriteRateLimit } from "@/lib/admin-write-rate-limit";
 import { withFileLock } from "@/lib/file-lock";
 import { invalidatePostCache } from "@/lib/posts";
-import { readJsonBodyWithLimit } from "@/lib/request-guards";
+import { enforceSameOrigin, readJsonBodyWithLimit } from "@/lib/request-guards";
 import path from "path";
 import { promises as fs } from "node:fs";
 
@@ -21,6 +21,14 @@ export async function POST(request: Request) {
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const originGuard = enforceSameOrigin(request);
+    if (!originGuard.ok) {
+      return Response.json(
+        { error: originGuard.error },
+        { status: originGuard.status }
+      );
     }
 
     const rateLimitResponse = await enforceAdminWriteRateLimit(

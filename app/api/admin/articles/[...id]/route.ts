@@ -15,7 +15,7 @@ import {
 import path from "path";
 import { promises as fs } from "node:fs";
 import { withFileLock } from "@/lib/file-lock";
-import { readJsonBodyWithLimit } from "@/lib/request-guards";
+import { enforceSameOrigin, readJsonBodyWithLimit } from "@/lib/request-guards";
 const postsDir = path.join(process.cwd(), "posts");
 
 export async function GET(
@@ -26,6 +26,14 @@ export async function GET(
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const originGuard = enforceSameOrigin(request);
+    if (!originGuard.ok) {
+      return Response.json(
+        { error: originGuard.error },
+        { status: originGuard.status }
+      );
     }
 
     const { id } = await params;
@@ -69,6 +77,14 @@ export async function PATCH(
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const originGuard = enforceSameOrigin(request);
+    if (!originGuard.ok) {
+      return Response.json(
+        { error: originGuard.error },
+        { status: originGuard.status }
+      );
     }
 
     const { id } = await params;
@@ -155,6 +171,14 @@ export async function DELETE(
     const session = await getAuthSession();
     if (!session) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const originGuard = enforceSameOrigin(request);
+    if (!originGuard.ok) {
+      return Response.json(
+        { error: originGuard.error },
+        { status: originGuard.status }
+      );
     }
 
     const rateLimitResponse = await enforceAdminWriteRateLimit(

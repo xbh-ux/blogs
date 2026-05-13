@@ -5,26 +5,34 @@
 - 安装 Node.js 20+
 - 安装 `git`
 - 推荐使用 `pm2` 管理进程
+- 当前生产目录建议使用：`/root/apps/blogs-next`
+- 当前生产运行建议使用：`pm2 + .next/standalone/server.js`
 
 首次部署：
 
 ```bash
-git clone https://github.com/xbh-ux/blogs.git
-cd blogs
-npm ci
+mkdir -p /root/apps
+cd /root/apps
+git clone https://github.com/xbh-ux/blogs.git blogs-next
+cd blogs-next
+npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 npm run build
-pm2 start npm --name blogs-next -- start
+PORT=8081 HOSTNAME=0.0.0.0 NODE_ENV=production pm2 start ./.next/standalone/server.js --name blogs-next --cwd /root/apps/blogs-next --update-env
 pm2 save
+pm2 startup
 ```
 
 ## 2. 日常发布（手动）
 
 ```bash
-cd /path/to/blogs
-git pull --ff-only origin main
-npm ci
+cd /root/apps/blogs-next
+git fetch origin main
+git checkout main
+git reset --hard origin/main
+npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 npm run build
-pm2 restart blogs-next
+pm2 restart blogs-next --update-env
+pm2 save
 ```
 
 ## 3. GitHub Actions 手动部署
@@ -42,17 +50,29 @@ pm2 restart blogs-next
 - `DEPLOY_PORT`（可选，默认 22）
 - `DEPLOY_PATH`
 - `DEPLOY_PM2_NAME`（可选，默认 `blogs-next`）
-- `DEPLOY_SERVICE_NAME`（可选，未使用 pm2 时用于 systemd）
+
+推荐值：
+
+```text
+DEPLOY_HOST=175.178.170.206
+DEPLOY_USER=root
+DEPLOY_PORT=22
+DEPLOY_PATH=/root/apps/blogs-next
+DEPLOY_PM2_NAME=blogs-next
+```
+
+> 说明：当前工作流已支持 `push main` 自动部署，同时保留 `Run workflow` 手动触发入口。
 
 ## 4. 回滚
 
 ```bash
-cd /path/to/blogs
+cd /root/apps/blogs-next
 git log --oneline -n 10
 git reset --hard <commit_sha>
-npm ci
+npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 npm run build
-pm2 restart blogs-next
+pm2 restart blogs-next --update-env
+pm2 save
 ```
 
 ## 5. 构建失败排查
@@ -63,4 +83,10 @@ pm2 restart blogs-next
 
 ```bash
 pm2 logs blogs-next --lines 200
+```
+
+- 如遇 `package-lock.json` 与 `package.json` 短暂不同步，可先使用：
+
+```bash
+npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 ```

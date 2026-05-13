@@ -16,3 +16,4 @@ tsconfig.tsbuildinfo
 .playwright-cli/
 crawl-output/
 ref-home.html
+cline-ssh-*.pem
