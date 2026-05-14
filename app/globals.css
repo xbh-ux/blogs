@@ -211,7 +211,7 @@ footer {
 
 .wiki-home-card--hero {
   grid-area: hero;
-  min-height: 0;
+  min-height: 248px;
 }
 
 .wiki-home-card--intro {
@@ -301,7 +301,7 @@ footer {
   grid-template-columns: minmax(154px, 220px) minmax(0, 1fr);
   align-items: center;
   gap: clamp(0.85rem, 2vw, 1.5rem);
-  min-height: 176px;
+  min-height: 206px;
   height: 100%;
   overflow: hidden;
 }
@@ -336,12 +336,12 @@ footer {
   justify-content: center;
   gap: clamp(0.5rem, 1vw, 0.9rem);
   min-width: 0;
-  padding: 0.25rem 0.25rem 0.25rem 0;
+  padding: 0.45rem 0.35rem 0.35rem 0;
 }
 
 .home-carousel__card {
   position: relative;
-  flex: 0 0 clamp(110px, 16vw, 154px);
+  flex: 0 0 clamp(104px, 14vw, 142px);
   --card-shift-scale: 1;
   aspect-ratio: 3 / 4;
   overflow: hidden;
@@ -356,7 +356,7 @@ footer {
       calc(var(--card-shift-y, 0%) * var(--card-shift-scale))
     )
     rotate(var(--card-rotate, 0deg));
-  margin-left: clamp(-10px, -1.2vw, -3px);
+  margin-left: clamp(-8px, -0.9vw, -2px);
   transition: transform 0.24s ease, box-shadow 0.24s ease;
   pointer-events: auto;
   will-change: transform;
@@ -1057,7 +1057,7 @@ html:not(.reduce-motion) .soft-reveal {
   }
 
   .home-carousel {
-    min-height: 176px;
+    min-height: 196px;
     grid-template-columns: minmax(132px, 180px) minmax(0, 1fr);
   }
 
@@ -1147,10 +1147,10 @@ html:not(.reduce-motion) .soft-reveal {
   }
 
   .home-carousel__card {
-    flex-basis: clamp(82px, 21vw, 112px);
+    flex-basis: clamp(80px, 19vw, 104px);
     padding: 7px;
-    margin-left: clamp(-10px, -2vw, -4px);
-    --card-shift-scale: 0.4;
+    margin-left: clamp(-8px, -1.5vw, -3px);
+    --card-shift-scale: 0.32;
   }
 
   .home-carousel__title {
